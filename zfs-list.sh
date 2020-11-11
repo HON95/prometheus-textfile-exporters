@@ -7,8 +7,8 @@ set -eu
 
 METRIC_NAMESPACE="node_zfs_zfs_list"
 METRIC_USED="${METRIC_NAMESPACE}_used_bytes"
-METRIC_AVAIL="${METRIC_NAMESPACE}_avail_bytes"
-METRIC_REFER="${METRIC_NAMESPACE}_refer_bytes"
+METRIC_AVAIL="${METRIC_NAMESPACE}_available_bytes"
+METRIC_REFER="${METRIC_NAMESPACE}_referenced_bytes"
 
 echo "# HELP $METRIC_USED The amount of space consumed by this dataset and its descendants."
 echo "# TYPE $METRIC_USED gauge"
