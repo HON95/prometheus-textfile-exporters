@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script for parsing some output from "zpool list" to Prometheus metrics format.
+# Script for parsing some output from "zpool list -Hp" to Prometheus metrics format.
 # Example usage: zpool list | zpool-list.sh | sponge zpool-list.prom
 
 set -eu
@@ -36,16 +36,8 @@ echo "# HELP $METRIC_HEALTH A number representing the overall health of the pool
 echo "# TYPE $METRIC_HEALTH gauge"
 echo "# UNIT $METRIC_HEALTH"
 
-parse_iec_number() {
-    numfmt --from=iec <<< "$1"
-}
-
 parse_percentage() {
     awk '{printf "%f\n", $1 / 100}' <<< "$1"
-}
-
-parse_mult() {
-    grep -Po '^\d+(?:\.\d*)?(?=x)' <<< "$1"
 }
 
 parse_health() {
@@ -63,12 +55,12 @@ parse_health() {
 parse_line() {
     parts=($@)
     pool="${parts[0]}"
-    size="$(parse_iec_number ${parts[1]})"
-    alloc="$(parse_iec_number ${parts[2]})"
-    free="$(parse_iec_number ${parts[3]})"
+    size="${parts[1]}"
+    alloc="${parts[2]}"
+    free="${parts[3]}"
     frag="$(parse_percentage ${parts[6]})"
     cap="$(parse_percentage ${parts[7]})"
-    dedup="$(parse_mult ${parts[8]})"
+    dedup="${parts[8]}"
     health="$(parse_health ${parts[9]})"
 
     echo "$METRIC_SIZE{pool=\"$pool\"} $size"
@@ -80,11 +72,6 @@ parse_line() {
     echo "$METRIC_HEALTH{pool=\"$pool\"} $health"
 }
 
-first_line=1
 while read line; do
-    if [[ $first_line == 1 ]]; then
-        first_line=0
-        continue
-    fi
     parse_line "$line"
 done
