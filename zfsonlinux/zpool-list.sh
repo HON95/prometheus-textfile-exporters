@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script for parsing some output from "zpool list -Hp" to Prometheus metrics format.
-# Example usage: zpool list | zpool-list.sh | sponge zpool-list.prom
+# Example usage: zpool list -Hp | zpool-list.sh | sponge zpool-list.prom
 
 set -eu
 
