@@ -1,7 +1,15 @@
 #!/bin/bash
 
-# Script for parsing some output from "zpool list -Hp" to Prometheus metrics format.
-# Example usage: zpool list -Hp | ./zpool-list.sh | sponge zpool-list.prom
+# Name: Prometheus textfile exporter for ZFS zpool list.
+# Description:
+#   Script for parsing output from "zpool list -Hp" to Prometheus metrics format.
+#   Example usage: zpool list -Hp | ./zpool-list.sh | sponge zpool-list.prom
+# Type: Prometheus textfile exporter
+# Author: HON
+# Version: 1.1.0
+# Changes
+#   1.1.0: Add more pool health statuses.
+#   1.0.0: Initial release.
 
 set -eu
 
@@ -32,7 +40,7 @@ echo "# UNIT $METRIC_CAP"
 echo "# HELP $METRIC_DEDUP The ratio of deduplication in the pool."
 echo "# TYPE $METRIC_DEDUP gauge"
 echo "# UNIT $METRIC_DEDUP"
-echo "# HELP $METRIC_HEALTH A number representing the overall health of the pool. 0 is online, 1 is degraded, 2 is faulted, -1 is unknown."
+echo "# HELP $METRIC_HEALTH A number representing the overall health of the pool. 0 is online, 1 is degraded, 2 is faulted, 3 is offline, 4 is unavail, 5 is removed, -1 is unknown."
 echo "# TYPE $METRIC_HEALTH gauge"
 echo "# UNIT $METRIC_HEALTH"
 
@@ -47,6 +55,12 @@ parse_health() {
         echo 1
     elif [[ $1 == "FAULTED" ]]; then
         echo 2
+    elif [[ $1 == "OFFLINE" ]]; then
+        echo 3
+    elif [[ $1 == "UNAVAIL" ]]; then
+        echo 4
+    elif [[ $1 == "REMOVED" ]]; then
+        echo 5
     else
         echo -1
     fi
